@@ -1,34 +1,43 @@
 package com.serenitydojo.exceptions;
 
+import java.io.IOException;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenWorkingWithExceptions {
+    WordCounter wordCounter = new WordCounter();
 
-    @Test
-    public void shouldShowTheLengthOfAString() {
-        StringProcessor stringProcessor = new StringProcessor();
-
-        String result = stringProcessor.showLengthOf("some string");
-
-        assertThat(result).isEqualTo("some string has a length of 11");
+    public WhenWorkingWithExceptions() {
     }
 
     @Test
-    public void shouldShowZeroForNullStrings() {
-
-        StringProcessor stringProcessor = new StringProcessor();
-
-        String result = stringProcessor.showLengthOf(null);
-
-        assertThat(result).isEqualTo("null has a length of 0");
+    public void shouldCountTheWordsInAString() {
+        int numberOfWords = wordCounter.numberOfWordsIn("some string");
+        assertThat(numberOfWords).isEqualTo(2);
     }
 
-    @Test(expected = TestEnvironmentUnavailableException.class)
-    public void shouldFindThePort() {
-        StringProcessor stringProcessor = new StringProcessor();
+    @Test
+    public void shouldReturnZeroForANullString() {
+        assertThat(wordCounter.numberOfWordsIn((String)null)).isEqualTo(0);
+    }
 
-        stringProcessor.getPortOf("A:https://www.google.com");
+    @Test
+    public void shouldCountWordsInAFile() throws Exception {
+        int numberOfWords = wordCounter.numberOfWordsInFile("src/main/resources/hello.txt");
+        assertThat(numberOfWords).isEqualTo(2);
+    }
+
+    @Test//(expected = FileHasNoWordsException.class)
+    public void shouldReportAnErrorIfTheFileDoesNotExist() throws Exception {
+        int numberOfWords = wordCounter.numberOfWordsInFile("file-that-does-not-exist.txt");
+        assertThat(numberOfWords).isEqualTo(0);
+
+    }
+
+    @Test(expected = FileHasNoWordsException.class)
+    public void shouldThrowMeaningfulExceptionIfThereAreNoWordsInTheFile() throws Exception, FileHasNoWordsException {
+        wordCounter.numberOfWordsInFile("src/main/resources/nowords.txt");
     }
 }
